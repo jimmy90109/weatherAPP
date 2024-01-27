@@ -1,38 +1,101 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weather_app/widget/initial.dart';
+import 'package:weather_app/widget/result.dart';
 
-import 'activity.dart';
-import 'provider.dart';
+class ResultState extends Cubit<String> {
+  ResultState() : super("initial");
+  void initial() => emit("initial");
+  void result() => emit("result");
+}
 
-/// The homepage of our application
-class Home extends StatelessWidget {
-  const Home({super.key});
+void main() {
+  runApp(
+    const ProviderScope(child: MyApp()),
+  );
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String input = "";
+  final controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        // Read the activityProvider. This will start the network request
-        // if it wasn't already started.
-        // By using ref.watch, this widget will rebuild whenever the
-        // the activityProvider updates. This can happen when:
-        // - The response goes from "loading" to "data/error"
-        // - The request was refreshed
-        // - The result was modified locally (such as when performing side-effects)
-        // ...
-        final AsyncValue<Activity> activity = ref.watch(activityProvider);
-
-        return Center(
-          /// Since network-requests are asynchronous and can fail, we need to
-          /// handle both error and loading states. We can use pattern matching for this.
-          /// We could alternatively use `if (activity.isLoading) { ... } else if (...)`
-          child: switch (activity) {
-            AsyncData(:final value) => Text('Activity: ${value.activity}'),
-            AsyncError() => const Text('Oops, something unexpected happened'),
-            _ => const CircularProgressIndicator(),
-          },
-        );
-      },
-    );
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: BlocProvider(
+          create: (_) => ResultState(),
+          child: BlocBuilder<ResultState, String>(builder: (context, state) {
+            return Scaffold(
+                backgroundColor: Colors.grey[300],
+                body: SafeArea(
+                  child: Column(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextField(
+                                controller: controller,
+                                decoration: const InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(),
+                                  labelText: '請輸入城市名稱',
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // FocusManager.instance.primaryFocus?.unfocus();
+                              context.read<ResultState>().initial();
+                              input = controller.text;
+                              context.read<ResultState>().result();
+                            },
+                            child: const Text("確認", style: TextStyle(color: Colors.black)),
+                          )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(32.0, 0, 32.0, 16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                          ),
+                          child: Center(child: Builder(builder: (context) {
+                            switch (state) {
+                              case "initial":
+                                return const InitialWidget();
+                              case "result":
+                                return ResultWidget(input);
+                              default:
+                                return Container();
+                            }
+                          })),
+                        ),
+                      ),
+                    ),
+                  ]),
+                ));
+          }),
+        ));
   }
 }
