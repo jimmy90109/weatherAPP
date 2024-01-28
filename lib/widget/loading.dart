@@ -5,13 +5,11 @@ class LoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final theme = Theme.of(context);
     return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Loading Weather',
-          // style: theme.textTheme.headlineSmall,
+          '正在搜尋中...',
         ),
         Padding(
           padding: EdgeInsets.all(16),

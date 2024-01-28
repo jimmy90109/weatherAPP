@@ -9,6 +9,7 @@ class ResultWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    //read riverpod
     final AsyncValue<Map> result = ref.watch(weatherProvider(city));
     if (result is AsyncLoading) {
       return const LoadingWidget();

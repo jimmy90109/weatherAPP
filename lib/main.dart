@@ -32,6 +32,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: BlocProvider(
+          //init widget state
           create: (_) => ResultState(),
           child: BlocBuilder<ResultState, String>(builder: (context, state) {
             return Scaffold(
@@ -45,6 +46,7 @@ class _MyAppState extends State<MyApp> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
+                              //serach bar
                               child: TextField(
                                 controller: controller,
                                 decoration: const InputDecoration(
@@ -58,7 +60,7 @@ class _MyAppState extends State<MyApp> {
                           ),
                           TextButton(
                             onPressed: () {
-                              // FocusManager.instance.primaryFocus?.unfocus();
+                              // refresh result widget
                               context.read<ResultState>().initial();
                               input = controller.text;
                               context.read<ResultState>().result();
@@ -86,6 +88,7 @@ class _MyAppState extends State<MyApp> {
                                 return const InitialWidget();
                               case "result":
                                 return ResultWidget(input);
+                              //must return a widget
                               default:
                                 return Container();
                             }
